@@ -12,11 +12,11 @@ This is called LIFO (Last In, First Out).
 ```mermaid
 graph TD;
     subgraph "Stack (LIFO)"
-        A["Item #1"]
-        B["Item #2"]
         C["Item #3"]
+        B["Item #2"]
+        A["Item #1"]
 
-        A ~~~ B ~~~ C
+        C ~~~ B ~~~ A
     end
 ```
 
