@@ -125,41 +125,41 @@ func TestPriorityQueueOperations(t *testing.T) {
 // Test concurrent access to the priority
 func TestPriorityQueueConcurrency(t *testing.T) {
 	pq := New(func(a, b *Item[int]) bool {
-			return a.Priority < b.Priority // Min-Heap
+		return a.Priority < b.Priority // Min-Heap
 	})
 	numOperations := 1000
 	for r := range numOperations {
-			pq.PushItem(r, r)
+		pq.PushItem(r, r)
 	}
 
 	resultsCh := make(chan int, numOperations)
 	// Use a single goroutine to pop items sequentially.
 	go func() {
-			for {
-					pq.mu.Lock()
-					if pq.Len() == 0 {
-							pq.mu.Unlock()
-							break
-					}
-					item, err := heap.Pop(pq).(*Item[int])
-					pq.mu.Unlock()
-					if err == false {
-							resultsCh <- item.Value
-					}
+		for {
+			pq.mu.Lock()
+			if pq.Len() == 0 {
+				pq.mu.Unlock()
+				break
 			}
-			close(resultsCh)
+			item, err := heap.Pop(pq).(*Item[int])
+			pq.mu.Unlock()
+			if err == false {
+				resultsCh <- item.Value
+			}
+		}
+		close(resultsCh)
 	}()
 
 	var results []int
 	for r := range resultsCh {
-			results = append(results, r)
+		results = append(results, r)
 	}
 
 	// Now check if results are in ascending order.
 	for i := 1; i < len(results); i++ {
-			if results[i-1] > results[i] {
-					t.Errorf("Items not in ascending order: %v", results)
-					break
-			}
+		if results[i-1] > results[i] {
+			t.Errorf("Items not in ascending order: %v", results)
+			break
+		}
 	}
 }
